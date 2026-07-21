@@ -196,7 +196,7 @@ Example response:
 
 ```json
 {
-    "message": "Validation failed"
+  "message": "Validation failed"
 }
 ```
 
@@ -214,9 +214,9 @@ Example error response:
 
 ```json
 {
-    "timestamp": "2026-07-21T12:00:00",
-    "status": 404,
-    "message": "Resource not found"
+  "timestamp": "2026-07-21T12:00:00",
+  "status": 404,
+  "message": "Resource not found"
 }
 ```
 
@@ -302,18 +302,6 @@ Run tests:
 mvn test
 ```
 
----
-
-## HTTP Status Codes
-
-| Status Code | Description |
-|---|---|
-| 200 OK | Request completed successfully |
-| 201 CREATED | Resource created successfully |
-| 204 NO CONTENT | Resource deleted successfully |
-| 400 BAD REQUEST | Validation error |
-| 404 NOT FOUND | Resource not found |
-| 500 INTERNAL SERVER ERROR | Server error |
 
 ---
 
