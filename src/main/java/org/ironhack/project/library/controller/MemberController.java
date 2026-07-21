@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.MemberRequest;
 import org.ironhack.project.library.dto.response.MemberResponse;
 import org.ironhack.project.library.service.MemberService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/members")
@@ -19,12 +18,17 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping
-    public ResponseEntity<List<MemberResponse>> getAllMembers() {
-        return ResponseEntity.ok(memberService.getAllMembers());
+    public ResponseEntity<Page<MemberResponse>> getAllMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        return ResponseEntity.ok(memberService.getAllMembers(page, size, sortBy));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponse> getMemberById(@PathVariable Long id) {
+
         return ResponseEntity.ok(memberService.getMemberById(id));
     }
 
