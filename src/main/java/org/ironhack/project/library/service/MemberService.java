@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.MemberRequest;
 import org.ironhack.project.library.dto.response.MemberResponse;
 import org.ironhack.project.library.entity.Member;
+import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.MemberMapper;
 import org.ironhack.project.library.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class MemberService {
     public MemberResponse getMemberById(Long id) {
 
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
 
         return MemberMapper.toResponse(member);
     }
@@ -44,7 +45,7 @@ public class MemberService {
     public MemberResponse updateMember(Long id, MemberRequest request) {
 
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
 
         member.setName(request.getName());
         member.setEmail(request.getEmail());
@@ -57,7 +58,7 @@ public class MemberService {
     public void deleteMember(Long id) {
 
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
 
         memberRepository.delete(member);
     }
