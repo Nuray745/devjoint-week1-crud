@@ -13,9 +13,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MemberRequest {
 
-    @NotBlank
+    @NotBlank(message = "Member name is required.")
     private String name;
 
-    @Email
+    @NotBlank(message = "Email is required.")
+    @Email(message = "Please provide a valid email address.")
     private String email;
 }
