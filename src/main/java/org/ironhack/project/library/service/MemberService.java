@@ -7,10 +7,11 @@ import org.ironhack.project.library.entity.Member;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.MemberMapper;
 import org.ironhack.project.library.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +19,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public List<MemberResponse> getAllMembers() {
-        return memberRepository.findAll()
-                .stream()
-                .map(MemberMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<MemberResponse> getAllMembers(int page, int size, String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        return memberRepository.findAll(pageable)
+                .map(MemberMapper::toResponse);
     }
 
     public MemberResponse getMemberById(Long id) {
