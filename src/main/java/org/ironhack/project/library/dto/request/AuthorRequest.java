@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuthorRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Author name is required.")
+    @Size(max = 100, message = "Author name must not exceed 100 characters.")
     private String name;
 }
