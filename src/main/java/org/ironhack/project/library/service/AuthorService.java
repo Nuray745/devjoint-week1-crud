@@ -7,10 +7,11 @@ import org.ironhack.project.library.entity.Author;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.AuthorMapper;
 import org.ironhack.project.library.repository.AuthorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +19,12 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    public List<AuthorResponse> getAllAuthors() {
-        return authorRepository.findAll()
-                .stream()
-                .map(AuthorMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<AuthorResponse> getAllAuthors(int page, int size, String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        return authorRepository.findAll(pageable)
+                .map(AuthorMapper::toResponse);
     }
 
     public AuthorResponse getAuthorById(Long id) {
