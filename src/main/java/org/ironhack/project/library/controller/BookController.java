@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.BookRequest;
 import org.ironhack.project.library.dto.response.BookResponse;
 import org.ironhack.project.library.service.BookService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/books")
@@ -19,12 +18,17 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public ResponseEntity<List<BookResponse>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<Page<BookResponse>> getAllBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        return ResponseEntity.ok(bookService.getAllBooks(page, size, sortBy));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BookResponse> getBookById(@PathVariable Long id) {
+
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
