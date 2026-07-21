@@ -3,6 +3,7 @@ package org.ironhack.project.library.service;
 import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.response.AuthorResponse;
 import org.ironhack.project.library.entity.Author;
+import org.ironhack.project.library.mapper.AuthorMapper;
 import org.ironhack.project.library.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,7 @@ public class AuthorService {
     public List<AuthorResponse> getAllAuthors() {
         return authorRepository.findAll()
                 .stream()
-                .map(author -> new AuthorResponse(
-                        author.getId(),
-                        author.getName()
-                ))
+                .map(AuthorMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -30,9 +28,6 @@ public class AuthorService {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found"));
 
-        return new AuthorResponse(
-                author.getId(),
-                author.getName()
-        );
+        return AuthorMapper.toResponse(author);
     }
 }
