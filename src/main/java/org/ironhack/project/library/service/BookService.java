@@ -30,11 +30,11 @@ public class BookService {
 
     public Page<BookResponse> getAllBooks(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return bookRepository.findAll(pageable).map(BookMapper::toResponse);
+        return bookRepository.findAllWithAuthor(pageable).map(BookMapper::toResponse);
     }
 
     public BookResponse getBookById(Long id) {
-        Book book = bookRepository.findById(id)
+        Book book = bookRepository.findByIdWithAuthor(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         return BookMapper.toResponse(book);
     }
@@ -46,16 +46,11 @@ public class BookService {
                 .map(BookMapper::toResponse);
     }
 
-
     public Page<BookResponse> filterBooks(String title, String isbn, String authorName, Boolean available,
                                           int page, int size, String sortBy) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-
         Specification<Book> spec = BookSpecification.buildFilter(title, isbn, authorName, available);
-
-        return bookRepository.findAll(spec, pageable)
-                .map(BookMapper::toResponse);
+        return bookRepository.findAll(spec, pageable).map(BookMapper::toResponse);
     }
 
     public List<BookResponse> getAvailableBooks() {

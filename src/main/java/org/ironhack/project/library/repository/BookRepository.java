@@ -3,6 +3,7 @@ package org.ironhack.project.library.repository;
 import org.ironhack.project.library.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
@@ -37,9 +39,20 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
                            @Param("authorName") String authorName,
                            Pageable pageable);
 
+
     @Query(value = "SELECT a.name AS author_name, COUNT(b.id) AS book_count " +
             "FROM authors a LEFT JOIN books b ON b.author_id = a.id " +
             "GROUP BY a.id, a.name " +
             "ORDER BY book_count DESC", nativeQuery = true)
     List<Object[]> countBooksPerAuthor();
+
+
+    @EntityGraph(attributePaths = {"author"})
+    @Query("SELECT b FROM Book b")
+    Page<Book> findAllWithAuthor(Pageable pageable);
+
+
+    @EntityGraph(attributePaths = {"author"})
+    @Query("SELECT b FROM Book b WHERE b.id = :id")
+    Optional<Book> findByIdWithAuthor(@Param("id") Long id);
 }
