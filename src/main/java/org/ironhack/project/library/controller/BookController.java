@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/books")
 @RequiredArgsConstructor
@@ -30,6 +32,36 @@ public class BookController {
     public ResponseEntity<BookResponse> getBookById(@PathVariable Long id) {
 
         return ResponseEntity.ok(bookService.getBookById(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookResponse>> searchBooks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String isbn,
+            @RequestParam(required = false) String authorName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        return ResponseEntity.ok(bookService.searchBooks(title, isbn, authorName, page, size, sortBy));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<BookResponse>> getAvailableBooks() {
+
+        return ResponseEntity.ok(bookService.getAvailableBooks());
+    }
+
+    @GetMapping("/borrowed")
+    public ResponseEntity<List<BookResponse>> getBorrowedBooks() {
+
+        return ResponseEntity.ok(bookService.getBorrowedBooks());
+    }
+
+    @GetMapping("/stats/count-per-author")
+    public ResponseEntity<List<Object[]>> getBookCountPerAuthor() {
+
+        return ResponseEntity.ok(bookService.getBookCountPerAuthor());
     }
 
     @PostMapping
