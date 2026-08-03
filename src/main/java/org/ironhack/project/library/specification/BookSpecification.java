@@ -47,8 +47,20 @@ public class BookSpecification {
         };
     }
 
+
+    public static Specification<Book> fetchAuthor() {
+        return (root, query, cb) -> {
+            if (Long.class != query.getResultType() && long.class != query.getResultType()) {
+                root.fetch("author", JoinType.LEFT);
+                query.distinct(true);
+            }
+            return cb.conjunction();
+        };
+    }
+
     public static Specification<Book> buildFilter(String title, String isbn, String authorName, Boolean available) {
-        return Specification.where(hasTitle(title))
+        return Specification.where(fetchAuthor())
+                .and(hasTitle(title))
                 .and(hasIsbn(isbn))
                 .and(hasAuthorName(authorName))
                 .and(isAvailable(available));
