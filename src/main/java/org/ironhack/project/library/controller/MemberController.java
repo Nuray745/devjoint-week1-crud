@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
@@ -30,6 +32,31 @@ public class MemberController {
     public ResponseEntity<MemberResponse> getMemberById(@PathVariable Long id) {
 
         return ResponseEntity.ok(memberService.getMemberById(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MemberResponse>> searchMembersByName(@RequestParam String name) {
+
+        return ResponseEntity.ok(memberService.searchMembersByName(name));
+    }
+
+    @GetMapping("/min-borrowed")
+    public ResponseEntity<List<MemberResponse>> getMembersWithAtLeastBorrowedBooks(
+            @RequestParam int minBooks) {
+
+        return ResponseEntity.ok(memberService.getMembersWithAtLeastBorrowedBooks(minBooks));
+    }
+
+    @GetMapping("/borrowed/{bookId}")
+    public ResponseEntity<List<MemberResponse>> getMembersByBorrowedBook(@PathVariable Long bookId) {
+
+        return ResponseEntity.ok(memberService.getMembersByBorrowedBook(bookId));
+    }
+
+    @GetMapping("/no-borrowed-books")
+    public ResponseEntity<List<MemberResponse>> getMembersWithNoBorrowedBooks() {
+
+        return ResponseEntity.ok(memberService.getMembersWithNoBorrowedBooks());
     }
 
     @PostMapping
