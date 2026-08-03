@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/authors")
 @RequiredArgsConstructor
@@ -30,6 +32,25 @@ public class AuthorController {
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
 
         return ResponseEntity.ok(authorService.getAuthorById(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<AuthorResponse>> searchAuthorsByName(@RequestParam String name) {
+
+        return ResponseEntity.ok(authorService.searchAuthorsByName(name));
+    }
+
+    @GetMapping("/min-books")
+    public ResponseEntity<List<AuthorResponse>> getAuthorsWithAtLeastBooks(
+            @RequestParam int minBooks) {
+
+        return ResponseEntity.ok(authorService.getAuthorsWithAtLeastBooks(minBooks));
+    }
+
+    @GetMapping("/no-books")
+    public ResponseEntity<List<AuthorResponse>> getAuthorsWithNoBooks() {
+
+        return ResponseEntity.ok(authorService.getAuthorsWithNoBooks());
     }
 
     @PostMapping
