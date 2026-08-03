@@ -39,6 +39,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
                            @Param("authorName") String authorName,
                            Pageable pageable);
 
+
     @Query(value = "SELECT a.name AS author_name, COUNT(b.id) AS book_count " +
             "FROM authors a LEFT JOIN books b ON b.author_id = a.id " +
             "GROUP BY a.id, a.name " +
