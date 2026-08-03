@@ -12,9 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -35,6 +37,7 @@ public class MemberService {
         return MemberMapper.toResponse(member);
     }
 
+    @Transactional
     public MemberResponse createMember(MemberRequest request) {
 
         Member member = MemberMapper.toEntity(request);
@@ -44,6 +47,7 @@ public class MemberService {
         return MemberMapper.toResponse(savedMember);
     }
 
+    @Transactional
     public MemberResponse updateMember(Long id, MemberRequest request) {
 
         Member member = memberRepository.findById(id)
@@ -57,6 +61,7 @@ public class MemberService {
         return MemberMapper.toResponse(updatedMember);
     }
 
+    @Transactional
     public void deleteMember(Long id) {
 
         Member member = memberRepository.findById(id)
