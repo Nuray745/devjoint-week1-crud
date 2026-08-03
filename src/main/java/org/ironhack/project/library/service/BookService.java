@@ -16,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,6 +40,33 @@ public class BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         return BookMapper.toResponse(book);
+    }
+
+    public Page<BookResponse> searchBooks(String title, String isbn, String authorName,
+                                          int page, int size, String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        return bookRepository.searchBooks(title, isbn, authorName, pageable)
+                .map(BookMapper::toResponse);
+    }
+
+    public List<BookResponse> getAvailableBooks() {
+
+        return bookRepository.findAvailableBooks().stream()
+                .map(BookMapper::toResponse)
+                .toList();
+    }
+
+    public List<BookResponse> getBorrowedBooks() {
+
+        return bookRepository.findBorrowedBooks().stream()
+                .map(BookMapper::toResponse)
+                .toList();
+    }
+
+    public List<Object[]> getBookCountPerAuthor() {
+        return bookRepository.countBooksPerAuthor();
     }
 
     @Transactional
