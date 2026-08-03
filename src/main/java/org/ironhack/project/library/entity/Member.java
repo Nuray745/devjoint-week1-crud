@@ -37,4 +37,14 @@ public class Member {
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
     private Set<Book> borrowedBooks = new HashSet<>();
+
+    public void borrowBook(Book book) {
+        this.borrowedBooks.add(book);
+        book.getMembers().add(this);
+    }
+
+    public void returnBook(Book book) {
+        this.borrowedBooks.remove(book);
+        book.getMembers().remove(this);
+    }
 }
