@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,6 +37,27 @@ public class AuthorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
 
         return AuthorMapper.toResponse(author);
+    }
+
+    public List<AuthorResponse> searchAuthorsByName(String name) {
+
+        return authorRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(AuthorMapper::toResponse)
+                .toList();
+    }
+
+    public List<AuthorResponse> getAuthorsWithAtLeastBooks(int minBooks) {
+
+        return authorRepository.findAuthorsWithAtLeastBooks(minBooks).stream()
+                .map(AuthorMapper::toResponse)
+                .toList();
+    }
+
+    public List<AuthorResponse> getAuthorsWithNoBooks() {
+
+        return authorRepository.findAuthorsWithNoBooks().stream()
+                .map(AuthorMapper::toResponse)
+                .toList();
     }
 
     @Transactional
