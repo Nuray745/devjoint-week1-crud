@@ -12,9 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
@@ -35,6 +37,7 @@ public class AuthorService {
         return AuthorMapper.toResponse(author);
     }
 
+    @Transactional
     public AuthorResponse createAuthor(AuthorRequest request) {
 
         Author author = AuthorMapper.toEntity(request);
@@ -44,6 +47,7 @@ public class AuthorService {
         return AuthorMapper.toResponse(savedAuthor);
     }
 
+    @Transactional
     public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
 
         Author author = authorRepository.findById(id)
@@ -56,6 +60,7 @@ public class AuthorService {
         return AuthorMapper.toResponse(updatedAuthor);
     }
 
+    @Transactional
     public void deleteAuthor(Long id) {
 
         Author author = authorRepository.findById(id)
