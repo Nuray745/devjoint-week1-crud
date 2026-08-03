@@ -46,7 +46,7 @@ public class BookService {
                 .map(BookMapper::toResponse);
     }
 
-    // YENİ — Specification API ilə dinamik filtrasiya
+
     public Page<BookResponse> filterBooks(String title, String isbn, String authorName, Boolean available,
                                           int page, int size, String sortBy) {
 
