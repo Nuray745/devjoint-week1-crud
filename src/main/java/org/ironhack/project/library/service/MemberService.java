@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,6 +37,34 @@ public class MemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
 
         return MemberMapper.toResponse(member);
+    }
+
+    public List<MemberResponse> searchMembersByName(String name) {
+
+        return memberRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(MemberMapper::toResponse)
+                .toList();
+    }
+
+    public List<MemberResponse> getMembersWithAtLeastBorrowedBooks(int minBooks) {
+
+        return memberRepository.findMembersWithAtLeastBorrowedBooks(minBooks).stream()
+                .map(MemberMapper::toResponse)
+                .toList();
+    }
+
+    public List<MemberResponse> getMembersByBorrowedBook(Long bookId) {
+
+        return memberRepository.findMembersByBorrowedBookId(bookId).stream()
+                .map(MemberMapper::toResponse)
+                .toList();
+    }
+
+    public List<MemberResponse> getMembersWithNoBorrowedBooks() {
+
+        return memberRepository.findMembersWithNoBorrowedBooks().stream()
+                .map(MemberMapper::toResponse)
+                .toList();
     }
 
     @Transactional
