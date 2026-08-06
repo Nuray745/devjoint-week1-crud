@@ -3,6 +3,7 @@ package org.ironhack.project.library.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.LoginRequest;
+import org.ironhack.project.library.dto.request.RefreshTokenRequest;
 import org.ironhack.project.library.dto.request.RegisterRequest;
 import org.ironhack.project.library.dto.response.AuthResponse;
 import org.ironhack.project.library.service.AuthService;
@@ -25,5 +26,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request.getRefreshToken()));
     }
 }
