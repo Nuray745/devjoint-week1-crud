@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.LoginRequest;
 import org.ironhack.project.library.dto.request.RegisterRequest;
 import org.ironhack.project.library.dto.response.AuthResponse;
+import org.ironhack.project.library.entity.RefreshToken;
 import org.ironhack.project.library.entity.Role;
 import org.ironhack.project.library.entity.User;
 import org.ironhack.project.library.exception.DuplicateResourceException;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -43,10 +47,12 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         String token = jwtService.generateToken(savedUser);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
 
-        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole().name());
+        return new AuthResponse(token, refreshToken.getToken(), savedUser.getUsername(), savedUser.getRole().name());
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
 
         authenticationManager.authenticate(
@@ -57,7 +63,23 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtService.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(token, user.getUsername(), user.getRole().name());
+        return new AuthResponse(token, refreshToken.getToken(), user.getUsername(), user.getRole().name());
+    }
+
+
+    @Transactional
+    public AuthResponse refreshToken(String requestRefreshToken) {
+
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken);
+        refreshToken = refreshTokenService.verifyExpiration(refreshToken);
+
+        User user = refreshToken.getUser();
+
+        String newAccessToken = jwtService.generateToken(user);
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+
+        return new AuthResponse(newAccessToken, newRefreshToken.getToken(), user.getUsername(), user.getRole().name());
     }
 }
