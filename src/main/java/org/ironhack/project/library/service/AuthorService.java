@@ -7,6 +7,8 @@ import org.ironhack.project.library.entity.Author;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.AuthorMapper;
 import org.ironhack.project.library.repository.AuthorRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
 
+    @Cacheable(value = "authors", key = "'all-' + #page + '-' + #size + '-' + #sortBy")
     public Page<AuthorResponse> getAllAuthors(int page, int size, String sortBy) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
@@ -31,6 +34,7 @@ public class AuthorService {
                 .map(AuthorMapper::toResponse);
     }
 
+    @Cacheable(value = "authors", key = "#id")
     public AuthorResponse getAuthorById(Long id) {
 
         Author author = authorRepository.findById(id)
@@ -61,6 +65,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse createAuthor(AuthorRequest request) {
 
         Author author = AuthorMapper.toEntity(request);
@@ -71,6 +76,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
 
         Author author = authorRepository.findById(id)
@@ -84,6 +90,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public void deleteAuthor(Long id) {
 
         Author author = authorRepository.findById(id)
