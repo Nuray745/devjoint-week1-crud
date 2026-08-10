@@ -29,6 +29,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
+    private final NotificationService notificationService;
 
     public Page<MemberResponse> getAllMembers(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
@@ -111,9 +112,10 @@ public class MemberService {
 
         Member updatedMember = memberRepository.save(member);
 
+        notificationService.sendBorrowConfirmation(member.getName(), book.getTitle());
+
         return MemberMapper.toResponse(updatedMember);
     }
-
 
     @Transactional
     public MemberResponse returnBook(Long memberId, Long bookId) {
@@ -131,6 +133,8 @@ public class MemberService {
         member.returnBook(book);
 
         Member updatedMember = memberRepository.save(member);
+
+        notificationService.sendReturnConfirmation(member.getName(), book.getTitle());
 
         return MemberMapper.toResponse(updatedMember);
     }
