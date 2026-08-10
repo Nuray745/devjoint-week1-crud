@@ -26,6 +26,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+    private final NotificationService notificationService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -49,7 +50,10 @@ public class AuthService {
         String token = jwtService.generateToken(savedUser);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
 
-        return new AuthResponse(token, refreshToken.getToken(), savedUser.getUsername(), savedUser.getRole().name());
+        notificationService.sendWelcomeEmail(savedUser.getUsername(), savedUser.getEmail());
+
+        return new AuthResponse(token, refreshToken.getToken(),
+                savedUser.getUsername(), savedUser.getRole().name());
     }
 
     @Transactional
@@ -65,9 +69,9 @@ public class AuthService {
         String token = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(token, refreshToken.getToken(), user.getUsername(), user.getRole().name());
+        return new AuthResponse(token, refreshToken.getToken(),
+                user.getUsername(), user.getRole().name());
     }
-
 
     @Transactional
     public AuthResponse refreshToken(String requestRefreshToken) {
@@ -80,6 +84,7 @@ public class AuthService {
         String newAccessToken = jwtService.generateToken(user);
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(newAccessToken, newRefreshToken.getToken(), user.getUsername(), user.getRole().name());
+        return new AuthResponse(newAccessToken, newRefreshToken.getToken(),
+                user.getUsername(), user.getRole().name());
     }
 }
