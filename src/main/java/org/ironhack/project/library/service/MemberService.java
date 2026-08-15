@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.request.MemberRequest;
 import org.ironhack.project.library.dto.response.MemberResponse;
 import org.ironhack.project.library.entity.Book;
+import org.ironhack.project.library.entity.BorrowRecord;
 import org.ironhack.project.library.entity.Member;
 import org.ironhack.project.library.exception.BookUnavailableException;
 import org.ironhack.project.library.exception.BorrowLimitExceededException;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.MemberMapper;
 import org.ironhack.project.library.repository.BookRepository;
+import org.ironhack.project.library.repository.BorrowRecordRepository;
 import org.ironhack.project.library.repository.MemberRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -31,6 +34,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
     private final NotificationService notificationService;
 
     public Page<MemberResponse> getAllMembers(int page, int size, String sortBy) {
@@ -115,8 +119,13 @@ public class MemberService {
         }
 
         member.borrowBook(book);
-
         Member updatedMember = memberRepository.save(member);
+
+        BorrowRecord record = new BorrowRecord();
+        record.setMember(member);
+        record.setBook(book);
+        record.setBorrowedAt(Instant.now());
+        borrowRecordRepository.save(record);
 
         notificationService.sendBorrowConfirmation(member.getName(), book.getTitle());
 
@@ -141,8 +150,13 @@ public class MemberService {
         }
 
         member.returnBook(book);
-
         Member updatedMember = memberRepository.save(member);
+
+        BorrowRecord record = borrowRecordRepository
+                .findFirstByMemberIdAndBookIdAndReturnedAtIsNullOrderByBorrowedAtDesc(memberId, bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Active borrow record not found"));
+        record.setReturnedAt(Instant.now());
+        borrowRecordRepository.save(record);
 
         notificationService.sendReturnConfirmation(member.getName(), book.getTitle());
 
