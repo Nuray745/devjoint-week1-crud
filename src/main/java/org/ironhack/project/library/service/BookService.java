@@ -10,6 +10,9 @@ import org.ironhack.project.library.mapper.BookMapper;
 import org.ironhack.project.library.repository.AuthorRepository;
 import org.ironhack.project.library.repository.BookRepository;
 import org.ironhack.project.library.specification.BookSpecification;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +31,13 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
 
+    @Cacheable(value = "books", key = "'all-' + #page + '-' + #size + '-' + #sortBy")
     public Page<BookResponse> getAllBooks(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return bookRepository.findAllWithAuthor(pageable).map(BookMapper::toResponse);
     }
 
+    @Cacheable(value = "books", key = "#id")
     public BookResponse getBookById(Long id) {
         Book book = bookRepository.findByIdWithAuthor(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
@@ -70,6 +75,7 @@ public class BookService {
     }
 
     @Transactional
+    @CacheEvict(value = "books", allEntries = true)
     public BookResponse createBook(BookRequest request) {
         Author author = authorRepository.findById(request.getAuthorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
@@ -79,6 +85,10 @@ public class BookService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#id"),
+            @CacheEvict(value = "books", allEntries = true)
+    })
     public BookResponse updateBook(Long id, BookRequest request) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
@@ -92,6 +102,10 @@ public class BookService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#id"),
+            @CacheEvict(value = "books", allEntries = true)
+    })
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
