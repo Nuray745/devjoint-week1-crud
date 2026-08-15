@@ -5,6 +5,7 @@ import org.ironhack.project.library.dto.response.MemberResponse;
 import org.ironhack.project.library.entity.Member;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.repository.BookRepository;
+import org.ironhack.project.library.repository.BorrowRecordRepository;
 import org.ironhack.project.library.repository.MemberRepository;
 import org.ironhack.project.library.service.MemberService;
 import org.ironhack.project.library.service.NotificationService;
@@ -33,6 +34,9 @@ class MemberServiceTest {
 
     @Mock
     private BookRepository bookRepository;
+
+    @Mock
+    private BorrowRecordRepository borrowRecordRepository;
 
     @Mock
     private NotificationService notificationService;
