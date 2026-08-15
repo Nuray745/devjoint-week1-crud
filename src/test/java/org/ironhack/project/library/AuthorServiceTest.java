@@ -1,12 +1,10 @@
-package org.ironhack.project.library;
-
+package org.ironhack.project.library.service;
 
 import org.ironhack.project.library.dto.request.AuthorRequest;
 import org.ironhack.project.library.dto.response.AuthorResponse;
 import org.ironhack.project.library.entity.Author;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.repository.AuthorRepository;
-import org.ironhack.project.library.service.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

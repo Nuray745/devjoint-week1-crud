@@ -1,6 +1,5 @@
 package org.ironhack.project.library;
 
-
 import org.ironhack.project.library.dto.request.BookRequest;
 import org.ironhack.project.library.dto.response.BookResponse;
 import org.ironhack.project.library.entity.Author;
@@ -67,35 +66,35 @@ class BookServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id"));
         Page<Book> bookPage = new PageImpl<>(List.of(book), pageable, 1);
 
-        when(bookRepository.findAll(any(Pageable.class))).thenReturn(bookPage);
+        when(bookRepository.findAllWithAuthor(any(Pageable.class))).thenReturn(bookPage);
 
         Page<BookResponse> response = bookService.getAllBooks(0, 10, "id");
 
         assertThat(response).isNotNull();
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).getTitle()).isEqualTo("Khamsa");
-        verify(bookRepository, times(1)).findAll(any(Pageable.class));
+        verify(bookRepository, times(1)).findAllWithAuthor(any(Pageable.class));
     }
 
     @Test
     @DisplayName("getBookById - Should return book when ID exists")
     void getBookById_Success() {
-        when(bookRepository.findById(10L)).thenReturn(Optional.of(book));
+        when(bookRepository.findByIdWithAuthor(10L)).thenReturn(Optional.of(book));
 
         BookResponse response = bookService.getBookById(10L);
 
         assertThat(response).isNotNull();
         assertThat(response.getTitle()).isEqualTo("Khamsa");
-        verify(bookRepository, times(1)).findById(10L);
+        verify(bookRepository, times(1)).findByIdWithAuthor(10L);
     }
 
     @Test
     @DisplayName("getBookById - Should throw ResourceNotFoundException when book not found")
     void getBookById_NotFound() {
-        when(bookRepository.findById(10L)).thenReturn(Optional.empty());
+        when(bookRepository.findByIdWithAuthor(10L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(10L));
-        verify(bookRepository, times(1)).findById(10L);
+        verify(bookRepository, times(1)).findByIdWithAuthor(10L);
     }
 
     @Test
