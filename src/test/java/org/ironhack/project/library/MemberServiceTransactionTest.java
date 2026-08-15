@@ -1,4 +1,5 @@
-package org.ironhack.project.library.service;
+package org.ironhack.project.library;
+
 
 import org.ironhack.project.library.entity.Author;
 import org.ironhack.project.library.entity.Book;
@@ -8,6 +9,7 @@ import org.ironhack.project.library.exception.BorrowLimitExceededException;
 import org.ironhack.project.library.repository.AuthorRepository;
 import org.ironhack.project.library.repository.BookRepository;
 import org.ironhack.project.library.repository.MemberRepository;
+import org.ironhack.project.library.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,6 @@ class MemberServiceTransactionTest {
     @Test
     void borrowBook_whenBookAlreadyBorrowed_shouldRollbackAndKeepDataConsistent() {
 
-
         Member firstBorrower = new Member();
         firstBorrower.setName("Vusal Vusalov");
         firstBorrower.setEmail("vusal@example.com");
@@ -67,15 +68,12 @@ class MemberServiceTransactionTest {
 
         memberService.borrowBook(firstBorrower.getId(), targetBook.getId());
 
-
         assertThrows(BookUnavailableException.class,
                 () -> memberService.borrowBook(member.getId(), targetBook.getId()));
-
 
         Member reloadedMember = memberRepository.findById(member.getId()).orElseThrow();
         assertTrue(reloadedMember.getBorrowedBooks().isEmpty(),
                 "Rollback baş vermədiyi üçün ikinci üzvə kitab səhv əlavə olunub");
-
 
         Book reloadedBook = bookRepository.findById(targetBook.getId()).orElseThrow();
         assertEquals(1, reloadedBook.getMembers().size(),
@@ -84,7 +82,6 @@ class MemberServiceTransactionTest {
 
     @Test
     void borrowBook_whenLimitExceeded_shouldRollbackAndNotAddExtraBook() {
-
 
         for (int i = 1; i <= 5; i++) {
             Book book = new Book();
@@ -95,7 +92,6 @@ class MemberServiceTransactionTest {
 
             memberService.borrowBook(member.getId(), book.getId());
         }
-
 
         Book sixthBook = new Book();
         sixthBook.setTitle("Book 6");
@@ -108,11 +104,9 @@ class MemberServiceTransactionTest {
         assertThrows(BorrowLimitExceededException.class,
                 () -> memberService.borrowBook(member.getId(), sixthBookId));
 
-
         Member reloadedMember = memberRepository.findById(member.getId()).orElseThrow();
         assertEquals(5, reloadedMember.getBorrowedBooks().size(),
                 "Limit aşıldığı halda əlavə kitab yanlışlıqla əlavə olunub - rollback işləməyib");
-
 
         Book reloadedSixthBook = bookRepository.findById(sixthBookId).orElseThrow();
         assertTrue(reloadedSixthBook.getMembers().isEmpty(),
@@ -122,10 +116,8 @@ class MemberServiceTransactionTest {
     @Test
     void returnBook_whenBookNotBorrowedByMember_shouldRollbackAndNotChangeState() {
 
-
         assertThrows(RuntimeException.class,
                 () -> memberService.returnBook(member.getId(), targetBook.getId()));
-
 
         Member reloadedMember = memberRepository.findById(member.getId()).orElseThrow();
         assertTrue(reloadedMember.getBorrowedBooks().isEmpty());
@@ -136,8 +128,6 @@ class MemberServiceTransactionTest {
 
     @Test
     void borrowBook_happyPath_shouldPersistBothSidesOfRelation() {
-
-        MemberService.class.getSimpleName();
 
         var response = memberService.borrowBook(member.getId(), targetBook.getId());
 

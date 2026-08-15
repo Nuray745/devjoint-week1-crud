@@ -1,12 +1,13 @@
 package org.ironhack.project.library;
 
-
 import org.ironhack.project.library.dto.request.MemberRequest;
 import org.ironhack.project.library.dto.response.MemberResponse;
 import org.ironhack.project.library.entity.Member;
 import org.ironhack.project.library.exception.ResourceNotFoundException;
+import org.ironhack.project.library.repository.BookRepository;
 import org.ironhack.project.library.repository.MemberRepository;
 import org.ironhack.project.library.service.MemberService;
+import org.ironhack.project.library.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private BookRepository bookRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private MemberService memberService;
