@@ -9,6 +9,7 @@ import org.ironhack.project.library.mapper.AuthorMapper;
 import org.ironhack.project.library.repository.AuthorRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,38 +28,30 @@ public class AuthorService {
 
     @Cacheable(value = "authors", key = "'all-' + #page + '-' + #size + '-' + #sortBy")
     public Page<AuthorResponse> getAllAuthors(int page, int size, String sortBy) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-
-        return authorRepository.findAll(pageable)
-                .map(AuthorMapper::toResponse);
+        return authorRepository.findAll(pageable).map(AuthorMapper::toResponse);
     }
 
     @Cacheable(value = "authors", key = "#id")
     public AuthorResponse getAuthorById(Long id) {
-
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
-
         return AuthorMapper.toResponse(author);
     }
 
     public List<AuthorResponse> searchAuthorsByName(String name) {
-
         return authorRepository.findByNameContainingIgnoreCase(name).stream()
                 .map(AuthorMapper::toResponse)
                 .toList();
     }
 
     public List<AuthorResponse> getAuthorsWithAtLeastBooks(int minBooks) {
-
         return authorRepository.findAuthorsWithAtLeastBooks(minBooks).stream()
                 .map(AuthorMapper::toResponse)
                 .toList();
     }
 
     public List<AuthorResponse> getAuthorsWithNoBooks() {
-
         return authorRepository.findAuthorsWithNoBooks().stream()
                 .map(AuthorMapper::toResponse)
                 .toList();
@@ -67,35 +60,32 @@ public class AuthorService {
     @Transactional
     @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse createAuthor(AuthorRequest request) {
-
         Author author = AuthorMapper.toEntity(request);
-
         Author savedAuthor = authorRepository.save(author);
-
         return AuthorMapper.toResponse(savedAuthor);
     }
 
     @Transactional
-    @CacheEvict(value = "authors", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "authors", key = "#id"),
+            @CacheEvict(value = "authors", allEntries = true)
+    })
     public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
-
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
-
         author.setName(request.getName());
-
         Author updatedAuthor = authorRepository.save(author);
-
         return AuthorMapper.toResponse(updatedAuthor);
     }
 
     @Transactional
-    @CacheEvict(value = "authors", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "authors", key = "#id"),
+            @CacheEvict(value = "authors", allEntries = true)
+    })
     public void deleteAuthor(Long id) {
-
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
-
         authorRepository.delete(author);
     }
 }
