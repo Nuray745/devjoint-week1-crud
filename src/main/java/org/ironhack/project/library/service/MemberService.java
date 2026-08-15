@@ -11,6 +11,8 @@ import org.ironhack.project.library.exception.ResourceNotFoundException;
 import org.ironhack.project.library.mapper.MemberMapper;
 import org.ironhack.project.library.repository.BookRepository;
 import org.ironhack.project.library.repository.MemberRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -91,6 +93,10 @@ public class MemberService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#bookId"),
+            @CacheEvict(value = "books", allEntries = true)
+    })
     public MemberResponse borrowBook(Long memberId, Long bookId) {
 
         Member member = memberRepository.findById(memberId)
@@ -118,6 +124,10 @@ public class MemberService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#bookId"),
+            @CacheEvict(value = "books", allEntries = true)
+    })
     public MemberResponse returnBook(Long memberId, Long bookId) {
 
         Member member = memberRepository.findById(memberId)
