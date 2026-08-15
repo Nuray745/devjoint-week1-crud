@@ -1,5 +1,7 @@
 package org.ironhack.project.library.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.ironhack.project.library.dto.response.UserResponse;
 import org.ironhack.project.library.entity.User;
@@ -15,10 +17,12 @@ import java.util.List;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin", description = "Admin-only user management")
 public class AdminController {
 
     private final UserRepository userRepository;
 
+    @Operation(summary = "Get all registered users")
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
 
@@ -29,6 +33,7 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
+    @Operation(summary = "Delete a user by ID")
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
 
