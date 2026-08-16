@@ -24,12 +24,15 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     List<Book> findByTitleContainingIgnoreCaseAndAuthor_NameContainingIgnoreCase(String title, String authorName);
 
+    @EntityGraph(attributePaths = {"author"})
     @Query("SELECT b FROM Book b WHERE b.members IS EMPTY")
     List<Book> findAvailableBooks();
 
+    @EntityGraph(attributePaths = {"author"})
     @Query("SELECT DISTINCT b FROM Book b WHERE b.members IS NOT EMPTY")
     List<Book> findBorrowedBooks();
 
+    @EntityGraph(attributePaths = {"author"})
     @Query("SELECT b FROM Book b JOIN b.author a " +
             "WHERE (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:isbn IS NULL OR b.isbn = :isbn) " +
